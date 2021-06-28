@@ -35,7 +35,7 @@ library:
   source-dirs: src
 
 executables:
-  my-project-exe:
+  haskelchain-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -43,7 +43,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - my-project
+    - haskelchain
 
 tests:
   spec:
@@ -54,7 +54,7 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - my-project
+    - haskelchain
     - hspec
     - HUnit
     - QuickCheck

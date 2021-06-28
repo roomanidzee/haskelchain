@@ -1,9 +1,7 @@
-# project-template
+# haskelchain
 
-[![Build Status](https://travis-ci.org/iu-haskell-spring-2020/project-template.svg?branch=master)](https://travis-ci.org/iu-haskell-spring-2020/project-template)
 
-Template for a Haskell project.
-
+Simple implementation of a Blockchain system
 ### Prerequisites
 
 This project relies on the [Haskell Stack tool](https://docs.haskellstack.org/en/stable/README/).
@@ -26,13 +24,13 @@ This will install all dependencies, including a proper version of GHC
 This project has one executable that you can run with
 
 ```
-stack exec my-project-exe
+stack exec haskelchain-exe
 ```
 
 During development it is recommended a combination of `build` and `exec`:
 
 ```
-stack build && stack exec my-project-exe
+stack build && stack exec haskelchain-exe
 ```
 
 Alternatively, you can run

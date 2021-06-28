@@ -30,6 +30,13 @@ ghc-options:
 
 dependencies:
 - base >= 4.7 && < 5
+- protolude
+- servant
+- servant-server
+- transformers
+- aeson
+- wai
+- warp
 
 library:
   source-dirs: src

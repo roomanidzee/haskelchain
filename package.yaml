@@ -1,0 +1,71 @@
+name:                haskelchain
+version:             0.0.0.1
+github:              "roomanidzee/haskelchain"
+license:             BSD3
+author:              "Andrey Romanov"
+maintainer:          "an.romanov@innopolis.university"
+copyright:           "2021 Innopolis University"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/roomanidzee/haskelchain#readme>
+
+custom-setup:
+  dependencies:
+  - base
+  - Cabal
+  - cabal-doctest >=1.0.2 && <1.1
+
+ghc-options:
+- -Wall -fno-warn-type-defaults
+
+dependencies:
+- base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+
+executables:
+  my-project-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - my-project
+
+tests:
+  spec:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - my-project
+    - hspec
+    - HUnit
+    - QuickCheck
+
+  doctests:
+    source-dirs: test
+    main: doctests.hs
+    other-modules: []
+    dependencies:
+    - base
+    - doctest
+    - Glob
+    - QuickCheck
+    - template-haskell

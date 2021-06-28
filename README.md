@@ -1,7 +1,8 @@
 # haskelchain
 
-
 Simple implementation of a Blockchain system
+
+[![Haskell CI](https://github.com/roomanidzee/haskelchain/actions/workflows/main.yml/badge.svg)](https://github.com/roomanidzee/haskelchain/actions/workflows/main.yml)
 ### Prerequisites
 
 This project relies on the [Haskell Stack tool](https://docs.haskellstack.org/en/stable/README/).

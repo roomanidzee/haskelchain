@@ -30,11 +30,15 @@ instance Binary Account
 
 instance Binary Transaction
 
+instance Binary (BlockF Transaction)
+
 instance Binary POSIXTime where
   get = fromInteger <$> (get :: Get Integer)
   put x = put $ (round x :: Integer)
 
 deriving instance Generic (MerkleF a)
+
+deriving instance Generic (BlockF Transaction)
 
 deriving instance Generic BlockHeader
 

@@ -7,18 +7,23 @@
 
 module Serialization where
 
-import Control.Comonad.Cofree
-import Crypto.Hash
-import Data.Binary
-import Data.Binary.Get
-import Data.ByteArray
+import Control.Comonad.Cofree (Cofree)
+import Crypto.Hash (digestFromByteString)
+import Data.Binary (Binary (get, put), Get)
+import Data.ByteArray (convert)
 import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as BSL
-import Data.Time.Clock
-import Data.Time.Clock.POSIX
-import Data.Vector.Binary
-import GHC.Generics
+import Data.Time.Clock ()
+import Data.Time.Clock.POSIX (POSIXTime)
+import Data.Vector.Binary ()
+import GHC.Generics (Generic)
 import Types
+  ( Account (..),
+    BlockF (..),
+    BlockHeader (BlockHeader),
+    HaskelchainHash,
+    MerkleF (..),
+    Transaction (Transaction),
+  )
 
 instance (Binary (f (Cofree f a)), Binary a) => Binary (Cofree f a)
 
@@ -34,7 +39,7 @@ instance Binary (BlockF Transaction)
 
 instance Binary POSIXTime where
   get = fromInteger <$> (get :: Get Integer)
-  put x = put $ (round x :: Integer)
+  put x = put (round x :: Integer)
 
 deriving instance Generic (MerkleF a)
 
@@ -52,4 +57,4 @@ instance Binary HaskelchainHash where
     case mDigest of
       Nothing -> fail "Not a valid digest"
       Just digest -> return digest
-  put digest = put $ (convert digest :: BS.ByteString)
+  put digest = put (convert digest :: BS.ByteString)

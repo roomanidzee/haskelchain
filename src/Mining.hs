@@ -2,28 +2,68 @@
 
 module Mining where
 
-import Control.Comonad.Cofree
-import Crypto.Hash
+import Control.Comonad.Cofree (Cofree ((:<)))
+import Crypto.Hash (hashlazy)
 import Crypto.Number.Serialize (os2ip)
-import Data.Binary
+import Data.Binary (encode)
 import qualified Data.Map as M
-import Data.Time.Clock
-import Data.Time.Clock.POSIX
+import Data.Time.Clock (NominalDiffTime)
+import Data.Time.Clock.POSIX (getPOSIXTime)
 import qualified Data.Vector as V
 import Protolude
-import Serialization
+  ( Bool (..),
+    Eq ((==)),
+    Floating (logBase),
+    Foldable (length, toList),
+    Fractional ((/)),
+    IO,
+    Int,
+    Integer,
+    Maybe (Just, Nothing),
+    Monad (return, (>>=)),
+    Monoid (mconcat),
+    Num ((*), (+), (-)),
+    Ord (min, (<), (>=)),
+    RealFrac (round),
+    filter,
+    fromIntegral,
+    fromMaybe,
+    map,
+    print,
+    sum,
+    tailMay,
+    take,
+    zipWith,
+    ($),
+    (++),
+  )
+import Serialization ()
 import Types
+  ( Account,
+    Block,
+    BlockF (Block),
+    BlockHeader (..),
+    Blockchain,
+    HaskelchainHash,
+    MerkleF (Genesis, Node),
+    Transaction (..),
+  )
 
 type TransactionPool = IO [Transaction]
 
+globalTransactionLimit :: Int
 globalTransactionLimit = 1000
 
+numBlocksToCalculateDifficulty :: Int
 numBlocksToCalculateDifficulty = 5
 
+genesisBlockDifficulty :: NominalDiffTime
 genesisBlockDifficulty = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
+targetTime :: NominalDiffTime
 targetTime = 10
 
+blockReward :: Integer
 blockReward = 1000
 
 addBlock :: Block -> BlockHeader -> Blockchain -> Blockchain
@@ -80,21 +120,21 @@ desiredDifficulty :: Blockchain -> Integer
 desiredDifficulty x = round $ loop x
   where
     loop (_ :< Genesis) = genesisBlockDifficulty
-    loop x@(_ :< Node _ xs) = oldDifficulty / adjustmentFactor
+    loop (_ :< Node _ xs) = oldDifficulty / adjustmentFactor
       where
         oldDifficulty = loop xs
         adjustmentFactor = min 4.0 $ targetTime `safeDiv` blockTimeAverage x
 
 difficulty :: Blockchain -> Integer
-difficulty bc = os2ip $ (hashlazy $ encode bc :: HaskelchainHash)
+difficulty bc = os2ip (hashlazy $ encode bc :: HaskelchainHash)
 
 mineOn :: TransactionPool -> Account -> Blockchain -> IO Blockchain
 mineOn pendingTransactions minerAccount parent = do
   ts <- pendingTransactions
-  ts <- return $ validTransactions parent ts
-  ts <- return $ take globalTransactionLimit ts
+  let tsTemp = validTransactions parent ts
+  let tsResult = take globalTransactionLimit tsTemp
   now <- getPOSIXTime
-  result <- loop now ts 0 (difficulty parent * 4)
+  result <- loop now tsResult 0 (difficulty parent * 4)
   after <- getPOSIXTime
   print $ after - now
   return result

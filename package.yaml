@@ -1,14 +1,14 @@
-name:                haskelchain
-version:             0.0.0.1
-github:              "roomanidzee/haskelchain"
-license:             BSD3
-author:              "Andrey Romanov"
-maintainer:          "an.romanov@innopolis.university"
-copyright:           "2021 Innopolis University"
+name: haskelchain
+version: 0.0.0.1
+github: "roomanidzee/haskelchain"
+license: BSD3
+author: "Andrey Romanov"
+maintainer: "an.romanov@innopolis.university"
+copyright: "2021 Innopolis University"
 
 extra-source-files:
-- README.md
-- ChangeLog.md
+  - README.md
+  - ChangeLog.md
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
@@ -17,62 +17,69 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/roomanidzee/haskelchain#readme>
+description: Please see the README on GitHub at <https://github.com/roomanidzee/haskelchain#readme>
 
 custom-setup:
   dependencies:
-  - base
-  - Cabal
-  - cabal-doctest >=1.0.2 && <1.1
+    - base
+    - Cabal
+    - cabal-doctest >=1.0.2 && <1.1
 
 ghc-options:
-- -Wall -fno-warn-type-defaults
+  - -Wall -fno-warn-type-defaults
 
 dependencies:
-- base >= 4.7 && < 5
-- protolude
-- servant
-- servant-server
-- transformers
-- aeson
-- wai
-- warp
+  - base >= 4.7 && < 5
+  - protolude
+  - servant
+  - servant-server
+  - transformers
+  - aeson
+  - wai
+  - warp
+  - comonad
+  - stm
+  - cryptonite
+  - containers
+  - time
+  - vector
+  - free
 
 library:
   source-dirs: src
 
 executables:
   haskelchain-exe:
-    main:                Main.hs
-    source-dirs:         app
+    main: Main.hs
+    source-dirs: app
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - haskelchain
+      - haskelchain
 
 tests:
   spec:
-    main:                Spec.hs
-    source-dirs:         test
+    main: Spec.hs
+    source-dirs: test
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - haskelchain
-    - hspec
-    - HUnit
-    - QuickCheck
+      - haskelchain
+      - hspec
+      - HUnit
+      - QuickCheck
 
   doctests:
     source-dirs: test
     main: doctests.hs
     other-modules: []
     dependencies:
-    - base
-    - doctest
-    - Glob
-    - QuickCheck
-    - template-haskell
+      - base
+      - doctest
+      - Glob
+      - QuickCheck
+      - template-haskell

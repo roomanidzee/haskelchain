@@ -30,11 +30,11 @@ newtype BlockF a = Block (V.Vector a) deriving (Eq, Show, Foldable, Traversable,
 
 type Block = BlockF Transaction
 
-type HaskoinHash = Digest SHA1
+type HaskelchainHash = Digest SHA1
 
 data BlockHeader = BlockHeader
   { _miner :: Account,
-    _parentHash :: HaskoinHash,
+    _parentHash :: HaskelchainHash,
     _nonce :: Integer,
     _minedAt :: POSIXTime
   }

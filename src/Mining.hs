@@ -16,7 +16,6 @@ import Protolude
     Floating (logBase),
     Foldable (length, toList),
     Fractional ((/)),
-    IO,
     Int,
     Integer,
     Maybe (Just, Nothing),
@@ -48,6 +47,7 @@ import Types
     MerkleF (Genesis, Node),
     Transaction (..),
   )
+import Prelude (IO)
 
 type TransactionPool = IO [Transaction]
 
@@ -153,7 +153,7 @@ mineOn pendingTransactions minerAccount parent = do
           log =
             if candidateDifficulty < bestDifficulty
               then do
-                print ("New candidate found: ", logBase 10 $ fromIntegral $ desiredDifficulty parent, logBase 10 $ fromIntegral $ candidateDifficulty)
+                print ("New candidate found: ", logBase 10 $ fromIntegral $ desiredDifficulty parent, logBase 10 $ fromIntegral candidateDifficulty)
                 return candidateDifficulty
               else return bestDifficulty
             where

@@ -49,6 +49,13 @@ dependencies:
   - memory
   - vector-binary-instances
   - directory
+  - mtl
+  - attoparsec
+  - string-conversions
+  - http-media
+  - base-compat
+  - blaze-markup
+  - blaze-html
 
 library:
   source-dirs: src

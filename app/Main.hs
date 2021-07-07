@@ -1,6 +1,7 @@
 module Main where
 
-import           MyProject
+
+import HaskelchainMain (launch)
 
 main :: IO ()
-main = run
+main = launch

@@ -35,7 +35,9 @@ dependencies:
   - servant-server
   - transformers
   - aeson
+  - text
   - wai
+  - wai-logger
   - warp
   - comonad
   - stm

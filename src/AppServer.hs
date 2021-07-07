@@ -10,44 +10,75 @@
 
 module AppServer where
 
-import Data.Aeson (ToJSON)
-import Data.Time.Calendar (Day, fromGregorian)
+import BlockchainService (createEmptyChainFile, listBalances, mineAndSaveBlock)
+import Data.Aeson (FromJSON, ToJSON)
 import GHC.Generics (Generic)
-import Prelude.Compat (Eq, Int, Monad (return), Show, String)
 import Servant
-  ( Application,
-    Get,
-    JSON,
-    Proxy (..),
-    Server,
-    serve,
-    type (:>),
-  )
-import Prelude ()
+import System.IO.Unsafe
+import Types
 
-data User = User
-  { name :: String,
-    age :: Int,
-    email :: String,
-    registration_date :: Day
+data BalanceList = BalanceList
+  { account :: Integer,
+    amount :: Integer
   }
   deriving (Eq, Show, Generic)
 
-instance ToJSON User
+instance ToJSON BalanceList
 
-type UserAPI = "users" :> Get '[JSON] [User]
+data BlockMineInfo = BlockMineInfo
+  { fileName :: String,
+    accountValue :: String
+  }
+  deriving (Eq, Show, Generic)
 
-users1 :: [User]
-users1 =
-  [ User "Isaac Newton" 372 "isaac@newton.co.uk" (fromGregorian 1683 3 1),
-    User "Albert Einstein" 136 "ae@mc2.org" (fromGregorian 1905 12 1)
-  ]
+instance FromJSON BlockMineInfo
 
-server :: Server UserAPI
-server = return users1
+instance ToJSON BlockMineInfo
 
-userAPI :: Proxy UserAPI
-userAPI = Proxy
+data BlockMineMessage = BlockMineMessage
+  {message :: String}
+  deriving (Eq, Show, Generic)
+
+instance ToJSON BlockMineMessage
+
+type API =
+  "listBalancesRoute"
+    :> Capture "file_name" String
+    :> Get '[JSON] [BalanceList]
+    :<|> "mineBlocksRoute"
+      :> ReqBody '[JSON] BlockMineInfo
+      :> Post '[JSON] BlockMineMessage
+    :<|> "createChainFileRoute"
+      :> Capture "file_name" String
+      :> Get '[JSON] BlockMineMessage
+
+convert :: (Account, Integer) -> BalanceList
+convert (Account accValue, amountValue) = BalanceList accValue amountValue
+
+appServer :: Server API
+{-# NOINLINE appServer #-}
+appServer = listBalancesRoute :<|> mineBlocksRoute :<|> createChainFileRoute
+  where
+    listBalancesRoute :: String -> Handler [BalanceList]
+    listBalancesRoute filePath = return result
+      where
+        accountWithBalances = unsafePerformIO (listBalances filePath)
+        result = map convert accountWithBalances
+
+    mineBlocksRoute :: BlockMineInfo -> Handler BlockMineMessage
+    mineBlocksRoute (BlockMineInfo _fileName _accountValue) = return result
+      where
+        minedMessage = unsafePerformIO (mineAndSaveBlock _fileName _accountValue)
+        result = BlockMineMessage minedMessage
+
+    createChainFileRoute :: String -> Handler BlockMineMessage
+    createChainFileRoute fileChain = return result
+      where
+        unitResult = unsafePerformIO (createEmptyChainFile fileChain)
+        result = BlockMineMessage ("file chain with path" ++ fileChain ++ "created")
+
+api :: Proxy API
+api = Proxy
 
 app :: Application
-app = serve userAPI server
+app = serve api appServer

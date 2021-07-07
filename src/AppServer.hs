@@ -14,8 +14,21 @@ import BlockchainService (createEmptyChainFile, listBalances, mineAndSaveBlock)
 import Data.Aeson (FromJSON, ToJSON)
 import GHC.Generics (Generic)
 import Servant
-import System.IO.Unsafe
-import Types
+  ( Application,
+    Capture,
+    Get,
+    Handler,
+    JSON,
+    Post,
+    Proxy (..),
+    ReqBody,
+    Server,
+    serve,
+    type (:<|>) (..),
+    type (:>),
+  )
+import System.IO.Unsafe (unsafePerformIO)
+import Types (Account (..))
 
 data BalanceList = BalanceList
   { account :: Integer,

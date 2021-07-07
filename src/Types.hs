@@ -9,13 +9,24 @@
 
 module Types where
 
-import Control.Comonad.Cofree
-import Control.Concurrent.STM.TVar
-import Crypto.Hash
-import qualified Data.Set as S
-import Data.Time.Clock.POSIX
+import Control.Comonad.Cofree (Cofree)
+import Crypto.Hash (Digest, SHA1)
+import Data.Time.Clock.POSIX (POSIXTime)
 import qualified Data.Vector as V
 import Protolude
+  ( Eq,
+    Foldable,
+    Functor,
+    Generic,
+    Integer,
+    Monoid,
+    Num,
+    Ord,
+    Semigroup,
+    Show,
+    Text,
+    Traversable,
+  )
 
 newtype Account = Account Integer deriving (Eq, Show, Num, Ord)
 
@@ -48,17 +59,3 @@ data MerkleF a
 type Blockchain = Cofree MerkleF Block
 
 deriving instance Semigroup (BlockF a)
-
-data ServerState = ServerState
-  { _longestChain :: TVar Blockchain,
-    _supernodes :: TVar (S.Set Supernode),
-    _txnPool :: TVar (S.Set Transaction)
-  }
-
-newtype SeedServer = SeedServer Text deriving (Eq, Show, Generic)
-
-data Supernode = Supernode
-  { _nodeName :: Text,
-    _nodeHost :: Text
-  }
-  deriving (Eq, Show, Generic, Ord)

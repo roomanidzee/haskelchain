@@ -10,9 +10,16 @@ import Data.Time.Clock.POSIX
 import qualified Data.Vector as V
 import Mining
   ( addBlock,
+    average,
     balances,
+    blockTimeAverage,
+    chains,
+    desiredDifficulty,
+    difficulty,
     headers,
     makeGenesis,
+    safeDiv,
+    targetTime,
     validTransactions,
     validateChain,
     validateTxn,
@@ -157,3 +164,110 @@ spec =
       let filterResult = validTransactions testChain testTransactions
 
       filterResult `shouldBe` []
+
+    it "perform saveDiv calculation" $ do
+      safeDiv 2 1 `shouldBe` 2
+
+    it "perform average calculation" $ do
+      let testValue = [1, 2, 3, 4, 5, 9]
+      average testValue `shouldBe` 4
+
+    it "flatten input blockchain to list of chain elements" $ do
+      let testString = "test_hash"
+
+      let testBlockHeader =
+            BlockHeader
+              { _miner = 1,
+                _parentHash = hash (packStr'' testString),
+                _nonce = 100,
+                _minedAt = unsafePerformIO getPOSIXTime
+              }
+
+      let genesisBlock = Block (V.fromList [])
+
+      let testTransaction = Transaction 300 500 100
+
+      let testBlock = Block (V.fromList [testTransaction])
+
+      let genesisChain = genesisBlock :< Genesis
+
+      let testChain = testBlock :< Node testBlockHeader genesisChain
+
+      let elementsList = chains testChain
+
+      length elementsList `shouldBe` 2
+
+    it "calculate average block time for an input blockchain" $ do
+      let testString = "test_hash"
+
+      let testBlockHeader =
+            BlockHeader
+              { _miner = 1,
+                _parentHash = hash (packStr'' testString),
+                _nonce = 100,
+                _minedAt = unsafePerformIO getPOSIXTime
+              }
+
+      let genesisBlock = Block (V.fromList [])
+
+      let testTransaction = Transaction 300 500 100
+
+      let testBlock = Block (V.fromList [testTransaction])
+
+      let genesisChain = genesisBlock :< Genesis
+
+      let testChain = testBlock :< Node testBlockHeader genesisChain
+
+      let averageBlockTime = blockTimeAverage testChain
+
+      averageBlockTime < targetTime `shouldBe` True
+
+    it "calculate desired difficulty for an input blockchain" $ do
+      let testString = "test_hash"
+
+      let testBlockHeader =
+            BlockHeader
+              { _miner = 1,
+                _parentHash = hash (packStr'' testString),
+                _nonce = 100,
+                _minedAt = unsafePerformIO getPOSIXTime
+              }
+
+      let genesisBlock = Block (V.fromList [])
+
+      let testTransaction = Transaction 300 500 100
+
+      let testBlock = Block (V.fromList [testTransaction])
+
+      let genesisChain = genesisBlock :< Genesis
+
+      let testChain = testBlock :< Node testBlockHeader genesisChain
+
+      let desiredDifficultyValue = desiredDifficulty testChain
+
+      desiredDifficultyValue > 0 `shouldBe` True
+
+    it "calculate difficulty for an input blockchain" $ do
+      let testString = "test_hash"
+
+      let testBlockHeader =
+            BlockHeader
+              { _miner = 1,
+                _parentHash = hash (packStr'' testString),
+                _nonce = 100,
+                _minedAt = unsafePerformIO getPOSIXTime
+              }
+
+      let genesisBlock = Block (V.fromList [])
+
+      let testTransaction = Transaction 300 500 100
+
+      let testBlock = Block (V.fromList [testTransaction])
+
+      let genesisChain = genesisBlock :< Genesis
+
+      let testChain = testBlock :< Node testBlockHeader genesisChain
+
+      let difficultyValue = difficulty testChain
+
+      difficultyValue > 0 `shouldBe` True

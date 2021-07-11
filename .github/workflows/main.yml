@@ -25,4 +25,4 @@ jobs:
         run: stack build
       
       - name: Test
-        run: stack test
+        run: stack test --coverage

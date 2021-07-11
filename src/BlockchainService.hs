@@ -36,7 +36,6 @@ loadOrCreateFileChain fileName initDir = do
       encodeFile fileName x
       return x
 
--- TODO think about return type
 mineAndSaveBlock :: IsString b => FilePath -> [Char] -> IO b
 mineAndSaveBlock fileName accountStorage = do
   let swapFile = fileName ++ ".tmp"
@@ -51,7 +50,6 @@ mineAndSaveBlock fileName accountStorage = do
   copyFile swapFile fileName
   return "Block mined and saved!"
 
--- TODO think about return type
 createEmptyChainFile :: FilePath -> IO ()
 createEmptyChainFile fileName = do
   chain <- makeGenesis

@@ -58,6 +58,7 @@ dependencies:
   - base-compat
   - blaze-markup
   - blaze-html
+  - utf8-string
 
 library:
   source-dirs: src
@@ -84,6 +85,8 @@ tests:
     dependencies:
       - haskelchain
       - hspec
+      - hspec-wai
+      - hspec-wai-json
       - HUnit
       - QuickCheck
 
@@ -96,4 +99,5 @@ tests:
       - doctest
       - Glob
       - QuickCheck
+      - haskelchain
       - template-haskell

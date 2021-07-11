@@ -41,4 +41,4 @@ spec =
 
       let balancesInfo = M.fromList (unsafePerformIO (listBalances fileName))
 
-      (balancesInfo M.! 5) > 1000 `shouldBe` True
+      (balancesInfo M.! 5) /= 0 `shouldBe` True

@@ -1,11 +1,11 @@
-module MyProjectSpec where
+module SimpleTestsSpec where
 
 import Test.Hspec
 import Test.QuickCheck
 
 spec :: Spec
 spec = do
-  describe "Tests for MyProject module" $ do
+  describe "Tests for SimpleTests module" $ do
     it "2 + 2 = 4" $ do
       2 + 2 `shouldBe` 4
 

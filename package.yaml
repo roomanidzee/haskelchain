@@ -58,6 +58,7 @@ dependencies:
   - base-compat
   - blaze-markup
   - blaze-html
+  - utf8-string
 
 library:
   source-dirs: src

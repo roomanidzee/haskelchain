@@ -85,6 +85,8 @@ tests:
     dependencies:
       - haskelchain
       - hspec
+      - hspec-wai
+      - hspec-wai-json
       - HUnit
       - QuickCheck
 

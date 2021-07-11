@@ -36,7 +36,6 @@ loadOrCreateFileChain fileName initDir = do
       encodeFile fileName x
       return x
 
--- TODO think about return type
 mineAndSaveBlock :: IsString b => FilePath -> [Char] -> IO b
 mineAndSaveBlock fileName accountStorage = do
   let swapFile = fileName ++ ".tmp"

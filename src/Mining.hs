@@ -69,11 +69,11 @@ blockReward = 1000
 addBlock :: Block -> BlockHeader -> Blockchain -> Blockchain
 addBlock block header chain = block :< Node header chain
 
--- TODO fix
+-- TODO make a better check in future
 validateChain :: Blockchain -> Bool
 validateChain _ = True
 
--- TODO fix
+-- TODO make a better check in future
 validateTxn :: Blockchain -> Transaction -> Bool
 validateTxn _ _ = True
 

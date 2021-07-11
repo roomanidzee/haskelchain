@@ -96,4 +96,5 @@ tests:
       - doctest
       - Glob
       - QuickCheck
+      - haskelchain
       - template-haskell

@@ -50,7 +50,6 @@ mineAndSaveBlock fileName accountStorage = do
   copyFile swapFile fileName
   return "Block mined and saved!"
 
--- TODO think about return type
 createEmptyChainFile :: FilePath -> IO ()
 createEmptyChainFile fileName = do
   chain <- makeGenesis

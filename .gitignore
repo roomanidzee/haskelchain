@@ -2,6 +2,8 @@
 .stack-work
 .metals
 .vscode
+*_file
+*.tmp
 haskelchain.cabal
 *~
 dist

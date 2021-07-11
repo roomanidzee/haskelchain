@@ -15,12 +15,12 @@ import Data.Aeson (FromJSON, ToJSON)
 import GHC.Generics (Generic)
 import Servant
   ( Application,
-    Capture,
     Get,
     Handler,
     JSON,
     Post,
     Proxy (..),
+    QueryParam,
     ReqBody,
     Server,
     serve,
@@ -56,13 +56,13 @@ instance ToJSON BlockMineMessage
 
 type API =
   "listBalancesRoute"
-    :> Capture "file_name" String
+    :> QueryParam "file_name" String
     :> Get '[JSON] [BalanceList]
     :<|> "mineBlocksRoute"
       :> ReqBody '[JSON] BlockMineInfo
       :> Post '[JSON] BlockMineMessage
     :<|> "createChainFileRoute"
-      :> Capture "file_name" String
+      :> QueryParam "file_name" String
       :> Get '[JSON] BlockMineMessage
 
 convert :: (Account, Integer) -> BalanceList
@@ -72,10 +72,13 @@ appServer :: Server API
 {-# NOINLINE appServer #-}
 appServer = listBalancesRoute :<|> mineBlocksRoute :<|> createChainFileRoute
   where
-    listBalancesRoute :: String -> Handler [BalanceList]
-    listBalancesRoute filePath = return result
+    listBalancesRoute :: Maybe String -> Handler [BalanceList]
+    listBalancesRoute inputElem
+      | inputElem == Nothing = return [BalanceList 0 0]
+      | otherwise = return result
       where
-        accountWithBalances = unsafePerformIO (listBalances filePath)
+        (Just fileNameValue) = inputElem
+        accountWithBalances = unsafePerformIO (listBalances fileNameValue)
         result = map convert accountWithBalances
 
     mineBlocksRoute :: BlockMineInfo -> Handler BlockMineMessage
@@ -84,11 +87,14 @@ appServer = listBalancesRoute :<|> mineBlocksRoute :<|> createChainFileRoute
         minedMessage = unsafePerformIO (mineAndSaveBlock _fileName _accountValue)
         result = BlockMineMessage minedMessage
 
-    createChainFileRoute :: String -> Handler BlockMineMessage
-    createChainFileRoute fileChain = return result
+    createChainFileRoute :: Maybe String -> Handler BlockMineMessage
+    createChainFileRoute inputElem
+      | inputElem == Nothing = return (BlockMineMessage "no such file chain")
+      | otherwise = return result
       where
-        unitResult = unsafePerformIO (createEmptyChainFile fileChain)
-        result = BlockMineMessage ("file chain with path" ++ fileChain ++ "created")
+        (Just fileNameValue) = inputElem
+        unitResult = unsafePerformIO (createEmptyChainFile fileNameValue)
+        result = BlockMineMessage ("file chain with path" ++ fileNameValue ++ "created")
 
 api :: Proxy API
 api = Proxy

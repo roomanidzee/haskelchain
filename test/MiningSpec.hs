@@ -9,7 +9,8 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.Time.Clock.POSIX
 import qualified Data.Vector as V
 import Mining
-  ( addBlock,
+  ( TransactionPool,
+    addBlock,
     average,
     balances,
     blockTimeAverage,
@@ -18,6 +19,7 @@ import Mining
     difficulty,
     headers,
     makeGenesis,
+    mineOn,
     safeDiv,
     targetTime,
     validTransactions,
@@ -35,6 +37,9 @@ import Types
 
 packStr'' :: String -> B.ByteString
 packStr'' = encodeUtf8 . T.pack
+
+transactionsPool :: TransactionPool
+transactionsPool = return [Transaction 300 500 100, Transaction 300 400 100]
 
 spec :: Spec
 spec =
@@ -165,7 +170,7 @@ spec =
 
       filterResult `shouldBe` []
 
-    it "perform saveDiv calculation" $ do
+    it "perform saveDiv calculation" $
       safeDiv 2 1 `shouldBe` 2
 
     it "perform average calculation" $ do
@@ -271,3 +276,33 @@ spec =
       let difficultyValue = difficulty testChain
 
       difficultyValue > 0 `shouldBe` True
+
+    it "performs mining process" $ do
+      let testAccount = 1
+
+      let testString = "test_hash"
+
+      let testBlockHeader =
+            BlockHeader
+              { _miner = 1,
+                _parentHash = hash (packStr'' testString),
+                _nonce = 100,
+                _minedAt = unsafePerformIO getPOSIXTime
+              }
+
+      let genesisBlock = Block (V.fromList [])
+
+      let testTransaction = Transaction 300 500 100
+
+      let testBlock = Block (V.fromList [testTransaction])
+
+      let genesisChain = genesisBlock :< Genesis
+
+      let testChain = testBlock :< Node testBlockHeader genesisChain
+
+      let newChain = unsafePerformIO (mineOn transactionsPool testAccount testChain)
+
+      let oldHeaders = headers testChain
+      let newHeaders = headers newChain
+
+      length newHeaders > length oldHeaders `shouldBe` True

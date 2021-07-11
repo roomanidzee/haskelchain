@@ -34,7 +34,6 @@ spec =
 
       headers testGenesisBlock `shouldBe` []
 
-    it "retrieve balances from input blockchain" $ do
       let testString = "test_hash"
 
       let testBlockHeader =

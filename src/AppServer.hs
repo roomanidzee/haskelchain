@@ -38,16 +38,6 @@ data BalanceList = BalanceList
 
 instance ToJSON BalanceList
 
-data BlockMineInfo = BlockMineInfo
-  { fileName :: String,
-    accountValue :: String
-  }
-  deriving (Eq, Show, Generic)
-
-instance FromJSON BlockMineInfo
-
-instance ToJSON BlockMineInfo
-
 data BlockMineMessage = BlockMineMessage
   {message :: String}
   deriving (Eq, Show, Generic)
@@ -59,8 +49,9 @@ type API =
     :> QueryParam "file_name" String
     :> Get '[JSON] [BalanceList]
     :<|> "mineBlocksRoute"
-      :> ReqBody '[JSON] BlockMineInfo
-      :> Post '[JSON] BlockMineMessage
+      :> QueryParam "file_name" String
+      :> QueryParam "account_value" String
+      :> Get '[JSON] BlockMineMessage
     :<|> "createChainFileRoute"
       :> QueryParam "file_name" String
       :> Get '[JSON] BlockMineMessage
@@ -81,9 +72,14 @@ appServer = listBalancesRoute :<|> mineBlocksRoute :<|> createChainFileRoute
         accountWithBalances = unsafePerformIO (listBalances fileNameValue)
         result = map convert accountWithBalances
 
-    mineBlocksRoute :: BlockMineInfo -> Handler BlockMineMessage
-    mineBlocksRoute (BlockMineInfo _fileName _accountValue) = return result
+    mineBlocksRoute :: Maybe String -> Maybe String -> Handler BlockMineMessage
+    mineBlocksRoute fileNameOpt accountValueOpt
+       | fileNameOpt == Nothing || accountValueOpt == Nothing = return (BlockMineMessage "no such file chain")
+       | fileNameOpt == Nothing && accountValueOpt == Nothing = return (BlockMineMessage "no such file chain")
+       | otherwise = return result
       where
+        (Just _fileName) = fileNameOpt
+        (Just _accountValue) = accountValueOpt
         minedMessage = unsafePerformIO (mineAndSaveBlock _fileName _accountValue)
         result = BlockMineMessage minedMessage
 

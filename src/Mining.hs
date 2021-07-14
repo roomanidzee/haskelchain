@@ -49,38 +49,53 @@ import Types
   )
 import Prelude (IO)
 
+-- typealias for the pool of transactions
 type TransactionPool = IO [Transaction]
 
+-- limitation for the amount of transactions, which can be performed
 globalTransactionLimit :: Int
 globalTransactionLimit = 1000
 
+-- how many blocks required for difficulty calculation
 numBlocksToCalculateDifficulty :: Int
 numBlocksToCalculateDifficulty = 5
 
+-- difficulty of empty blockchain block
 genesisBlockDifficulty :: NominalDiffTime
 genesisBlockDifficulty = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
+-- target time for difficulty calculation
 targetTime :: NominalDiffTime
 targetTime = 10
 
+--reward for block calculation
 blockReward :: Integer
 blockReward = 1000
 
-addBlock :: Block -> BlockHeader -> Blockchain -> Blockchain
+-- method for adding the block to existed blockchain
+addBlock ::
+  Block -> -- input block
+  BlockHeader -> -- metadata for a new block
+  Blockchain -> -- existed chain with blocks
+  Blockchain -- new blockchain
 addBlock block header chain = block :< Node header chain
 
+-- checks if input blockchain is valid for operations
 -- TODO make a better check in future
 validateChain :: Blockchain -> Bool
 validateChain _ = True
 
+-- checks if input blockchain and transaction are valid for operations
 -- TODO make a better check in future
 validateTxn :: Blockchain -> Transaction -> Bool
 validateTxn _ _ = True
 
+-- method for metadata from input blockchain
 headers :: Blockchain -> [BlockHeader]
 headers (_ :< Genesis) = []
 headers (_ :< Node x next) = x : headers next
 
+-- calculation of balance for each account in blockchain
 balances :: Blockchain -> M.Map Account Integer
 balances bc =
   let txns = toList $ mconcat $ toList bc
@@ -89,6 +104,7 @@ balances bc =
       minings = map (\h -> (_miner h, blockReward)) $ headers bc
    in M.fromListWith (+) $ debits ++ credits ++ minings
 
+-- retrieving of valid transactions from blockchain by filtering of input transactions
 validTransactions :: Blockchain -> [Transaction] -> [Transaction]
 validTransactions bc txns =
   let accounts = balances bc
@@ -97,6 +113,7 @@ validTransactions bc txns =
         Just balance -> balance >= _amount txn
    in filter validTxn txns
 
+-- creation of empty blockchain block
 makeGenesis :: IO Blockchain
 makeGenesis = return $ Block (V.fromList []) :< Genesis
 
@@ -106,15 +123,18 @@ safeDiv n d = n / (if d == 0 then 1 else d)
 average :: (Foldable f, Num a, Fractional a, Eq a) => f a -> a
 average xs = sum xs `safeDiv` fromIntegral (length xs)
 
+-- flatenning of input blockchain to list of blocks
 chains :: Blockchain -> [Blockchain]
 chains x@(_ :< Genesis) = [x]
 chains x@(_ :< Node _ next) = x : chains next
 
+--calculation of average block time to be produced
 blockTimeAverage :: Blockchain -> NominalDiffTime
 blockTimeAverage bc = average $ zipWith (-) times (fromMaybe [] $ tailMay times)
   where
     times = take numBlocksToCalculateDifficulty $ map _minedAt $ headers bc
 
+-- desired difficulty for input blockchain
 -- BEWARE: O(n * k), where k = numBlocksToCalculateDifficulty
 desiredDifficulty :: Blockchain -> Integer
 desiredDifficulty x = round $ loop x
@@ -125,9 +145,11 @@ desiredDifficulty x = round $ loop x
         oldDifficulty = loop xs
         adjustmentFactor = min 4.0 $ targetTime `safeDiv` blockTimeAverage x
 
+-- just a difficulty for input blockchain
 difficulty :: Blockchain -> Integer
 difficulty bc = os2ip (hashlazy $ encode bc :: HaskelchainHash)
 
+-- mining of block on transacction pool for particular account and blockchain
 mineOn :: TransactionPool -> Account -> Blockchain -> IO Blockchain
 mineOn pendingTransactions minerAccount parent = do
   ts <- pendingTransactions

@@ -3,6 +3,7 @@
 Simple implementation of a Blockchain system
 
 [![Haskell CI](https://github.com/roomanidzee/haskelchain/actions/workflows/main.yml/badge.svg)](https://github.com/roomanidzee/haskelchain/actions/workflows/main.yml)
+
 ### Prerequisites
 
 This project relies on the [Haskell Stack tool](https://docs.haskellstack.org/en/stable/README/).
@@ -114,7 +115,53 @@ _Note: you can also run `ghcid` without parameters and it will detect
 Stack project, but you'll have to use system-wide `.ghci`.
 See [ndmitchell/ghcid#72](https://github.com/ndmitchell/ghcid/issues/72) for more details._
 
-Here's a sample development enviroment with a text editor (left),
-`ghcid` (top right) and `stack repl` (bottom right):
+## How to work with blockchain
 
-![Vim + ghcid + stack repl](images/ghcid-demo.png)
+You can work with by two methods:
+
+- from GHCI:
+
+```haskell
+import Mining()
+import Types()
+
+let testTransaction = Transaction 300 500 100
+
+let testBlock = Block (V.fromList [testTransaction, testTransaction])
+
+let testGenesisBlock = Block (V.fromList [])
+
+let genesisChain = testGenesisBlock :< Genesis
+
+let newBlock = Block (V.fromList [testTransaction])
+
+let testString = "test_hash"
+
+let testBlockHeader =
+     BlockHeader
+        { _miner = 1,
+          _parentHash = hash (packStr'' testString),
+          _nonce = 100,
+          _minedAt = unsafePerformIO getPOSIXTime
+        }
+
+let testChain = testBlock :< Node testBlockHeader genesisChain
+
+let newChain = addBlock newBlock testBlockHeader testChain
+
+```
+
+- from HTTP API:
+
+```
+
+GET localhost:8081/createChainFileRoute?file_name=genesis_chain1_file 
+  return string with creation result
+
+GET localhost:8081/listBalancesRoute?file_name=genesis_chain_file
+  return balances from input file chain path
+
+GET localhost:8081/mineBlocksRoute?file_name=genesis_chain_file&account_value=1
+  performs mining process and return status string about process
+
+```

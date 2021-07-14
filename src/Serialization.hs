@@ -26,6 +26,13 @@ import Types
     Transaction (Transaction),
   )
 
+{-
+
+This module contains useful instances for serializing and deserializing
+blockchain models with binary data format
+
+-}
+
 instance (Binary (f (Cofree f a)), Binary a) => Binary (Cofree f a)
 
 instance (Binary a) => Binary (MerkleF a)

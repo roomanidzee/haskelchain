@@ -124,6 +124,17 @@ You can work with by two methods:
 ```haskell
 import Mining()
 import Types()
+import Control.Comonad.Cofree (Cofree (..))
+import Crypto.Hash
+import qualified Data.ByteString as B
+import qualified Data.Text as T
+import Data.Text.Encoding (encodeUtf8)
+import qualified Data.Vector as V
+import System.IO.Unsafe (unsafePerformIO)
+import Data.Time.Clock.POSIX
+
+packStr'' :: String -> B.ByteString
+packStr'' = encodeUtf8 . T.pack
 
 let testTransaction = Transaction 300 500 100
 
@@ -148,6 +159,45 @@ let testBlockHeader =
 let testChain = testBlock :< Node testBlockHeader genesisChain
 
 let newChain = addBlock newBlock testBlockHeader testChain
+
+show (headers newChain)
+
+show (balances newChain)
+
+let blockChains = chains newChain
+length(blockChain)
+
+show(blockTimeAverage newChain)
+
+show(desiredDifficulty newChain)
+
+show(difficulty newChain)
+
+transactionsPool = return [Transaction 300 500 100, Transaction 300 400 100]
+let testAccount = 1
+let minedChain = unsafePerformIO (mineOn transactionsPool testAccount newChain)
+
+show(headers newChain)
+show(headers minedChain)
+
+-- ================================================================
+
+import BlockchainService()
+import System.IO.Unsafe (unsafePerformIO)
+import Mining()
+import Types()
+
+unsafePerformIO (createEmptyChainFile "genesis_chain_file")
+let genesisChainNew = makeGenesis
+let existedChain = unsafePerformIO (loadOrCreateFileChain "genesis_chain_file" genesisChainNew)
+show(headers existedChain)
+
+let testMineAccount = "5"
+let fileName = "mined_file"
+show (unsafePerformIO(mineAndSaveBlock fileName testMineAccount)::String)
+
+show (unsafePerformIO(listBalances "mined_file"))
+
 
 ```
 
